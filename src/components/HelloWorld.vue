@@ -1,0 +1,391 @@
+<template>
+  <section class="banner__carousel ralt container">
+    <br>
+    <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active"
+          aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1"
+          aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2"
+          aria-label="Slide 3"></button>
+      </div>
+      <div class="carousel-inner">
+        <div class="carousel-item active">
+          <a href="https://uz.post" target="_blank">
+            <img src="assets/img/reklama/rek1.png" class="d-block w-100" alt="banner1">
+          </a>
+        </div>
+        <div class="carousel-item">
+          <a href="https://uz.post" target="_blank">
+            <img src="assets/img/reklama/rek2.png" class="d-block w-100" alt="banner2">
+          </a>
+        </div>
+      </div>
+      <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+        data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+        data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </section>
+
+  <section class="task__sectiontop ralt pt-120 pb-120">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-xxl-6 col-xl-8 col-lg-8">
+          <div class="section__title text-center ralt mb-60">
+            <form action="#"
+              class="search__component mb-24 d-flex align-items-center justify-content-between wow fadeInUp">
+              <input v-model="trackingNumber" id="trackingNumberInput" placeholder="CC123456789UZ"
+                class="faded-placeholder">
+              <button type="button" class="cmn--btn d-flex align-items-center" @click="fetchTrackingData">
+                <span>Kuzatish</span>
+                <span><i class="bi bi-search fz-12"></i></span>
+              </button>
+            </form>
+            <div v-if="loading" class="loading-text">
+              <span>Ma'lumotlar yuklanmoqda...</span>
+            </div>
+            <!-- Error message if no data is found -->
+            <div v-if="errorMessage" class="error-text">
+              <span>{{ errorMessage }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row ralt g-4" v-if="trackingData">
+        <h2 class="title wow fadeInUp mb-24 center" id="trackingNumberDisplay">{{ trackingData.number }}</h2>
+        <div v-if="trackingData.senderCountry" class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 wow fadeInDown">
+          <div class="task__item round16 bgwhite d-flex align-items-center">
+            <div class="thumb">
+              <img src="assets/img/task/tast1.jpg" alt="img">
+            </div>
+            <div class="content">
+              <h3 class="inter title2 mb-24">Yuboruvchi</h3>
+              <p v-if="trackingData.senderCountry" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Mamlakat: </strong> <br>
+                <span id="senderCountry" class="textrang">{{ trackingData.senderCountry }}</span>
+              </p>
+              <p v-if="trackingData.senderAddress" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Manzil:</strong> <br>
+                <span id="senderAddress" class="textrang">{{ trackingData.senderAddress }}</span>
+              </p>
+
+              <p v-if="trackingData.senderPostcode" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Pochta indeksi:</strong> <br>
+                <span id="senderPostcode" class="textrang">{{ trackingData.senderPostcode }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="trackingData.recipientCountry" class="col-xxl-6 col-xl-6 col-lg-6 col-md-6 wow fadeInUp">
+          <div class="task__item round16 bgwhite d-flex align-items-center">
+            <div class="thumb">
+              <img src="assets/img/task/tast2.jpg" alt="img">
+            </div>
+            <div class="content">
+              <h3 class="inter title2 mb-24">Qabul qiluvchi</h3>
+              <p v-if="trackingData.recipientCountry" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Mamlakat:</strong> <br>
+                <span id="recipientCountry" class="textrang">{{ trackingData.recipientCountry }}</span>
+              </p>
+              <p v-if="trackingData.recipientAddress" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Manzil:</strong> <br>
+                <span id="recipientAddress" class="textrang">{{ trackingData.recipientAddress }}</span>
+              </p>
+              <p v-if="trackingData.recipientPostcode" class="fz-16 fw-400 inter pra mb-40">
+                <strong>Pochta indeksi:</strong> <br>
+                <span id="recipientPostcode" class="textrang">{{ trackingData.recipientPostcode }}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-8">
+          <div class="service__detailswrapper">
+            <div class="trending__based mb-40 bgwhite round16 shadow1">
+              <div class="based__content border round16 bgwhite">
+                <div class="freelancer__education bborderdash pb-30 mb-30">
+                  <!-- <span class="fz-20 mb-24 d-block inter title fw-600">Kuzatuv</span> -->
+                  <h3 class="title2">Kuzatuv</h3>
+                  <ul class="blog__categories" id="combinedTracking">
+                    <!-- Shipox kuzatuv ma'lumotlari shu yerga kiritiladi -->
+                    <li v-for="(event, index) in combinedTracking" :key="index">
+                      <a href="#0" class="d-flex align-items-center">
+                        <span class="fz-12 fw-500 title inter">{{ event.date.toLocaleString() }}</span>
+                        <span class="cateicon">
+                          <img :src="`assets/img/flags/${event.country_code.toLowerCase()}.svg`" alt="flag"
+                            class="flag-icon">
+                        </span>
+                        <span class="fz-12 d-block fw-500 inter success2 region-info">{{ event.region }}</span>
+                        <span class="fz-12 d-block fw-500 inter success2 region-info">{{ event.data }}</span>
+                        <span class="fz-12 fw-500 inter title d-block">{{ event.location }}</span>
+                        <span class="fz-12 d-block fw-500 inter success2">{{ event.status }}</span>
+                      </a>
+
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-4 col-lg-4">
+          <div class="basic__skilled__wrapper">
+            <div class="darrell__profile round16 bgwhite">
+              <div id="adCarousel" class="carousel slide" data-bs-ride="carousel">
+                <div class="carousel-inner">
+                  <div class="carousel-item active">
+                    <a href="https://uz.post" target="_blank">
+                      <img src="assets/img/reklama/11.png" class="d-block w-100" alt="ad1">
+                    </a>
+                  </div>
+                  <div class="carousel-item">
+                    <a href="https://uz.post" target="_blank">
+                      <img src="assets/img/reklama/12.png" class="d-block w-100" alt="ad2">
+                    </a>
+                  </div>
+                  <div class="carousel-item">
+                    <a href="https://uz.post" target="_blank">
+                      <img src="assets/img/reklama/13.png" class="d-block w-100" alt="ad2">
+                    </a>
+                  </div>
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#adCarousel" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#adCarousel" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Next</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+  <!--Footer Section-->
+  <footer class="footer__section bgadd">
+    <div class="container">
+
+      <div class="footer__bottom d-flex align-items-center">
+        <p class="fz-16 fw-400 inter text-white">
+          Copyright &copy; 2024 <a href="javascript:void(0)" class="hover"></a> &nbsp; “O‘zbekiston pochtasi”
+          aksiyadorlik jamiyati<a href="https://chiko.uz" class="base3"></a>
+        </p>
+        <ul class="help__support d-flex align-items-center">
+          <li>
+            <a href="https://t.me/shipox_admin/" class="text-white fz-16 fw-400 inter">
+              Yordam va qo‘llab-quvvatlash
+            </a>
+          </li>
+          <li>
+            <a href="https://t.me/shipox_admin/" class="text-white fz-16 fw-400 inter">
+              Reklama uchun
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" class="text-white fz-16 fw-400 inter">
+              Foydalanish shartlari
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </footer>
+  <!--Footer Section-->
+
+  <!-- <div>
+    <div id="loader" v-if="loading">Loading...</div>
+    <input v-model="trackingNumber" placeholder="Tracking number" />
+    <button @click="fetchTrackingData">Track</button>
+
+    <div id="trackingPopup" v-if="trackingData">
+      <h2>Tracking Number: {{ trackingData.number }}</h2>
+      <p>Sender Country: {{ trackingData.senderCountry }}</p>
+      <p>Sender Address: {{ trackingData.senderAddress }}</p>
+      <p>Sender Postcode: {{ trackingData.senderPostcode }}</p>
+      <p>Recipient Country: {{ trackingData.recipientCountry }}</p>
+      <p>Recipient Address: {{ trackingData.recipientAddress }}</p>
+      <p>Recipient Postcode: {{ trackingData.recipientPostcode }}</p>
+
+      <ul id="combinedTracking">
+        <li v-for="(event, index) in combinedTracking" :key="index">
+          <a href="#0" class="d-flex align-items-center">
+            <span class="fz-12 fw-500 title inter">{{ event.date.toLocaleString() }}</span>
+            <span class="cateicon">
+              <img :src="`assets/img/flags/${event.country_code.toLowerCase()}.svg`" alt="flag" class="flag-icon">
+            </span>
+            <span class="fz-12 fw-500 inter title d-block">{{ event.location }}</span>
+            <span class="fz-12 d-block fw-500 inter success2">{{ event.status }}</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </div> -->
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      trackingNumber: '',
+      loading: false,  // Ma'lumot yuklanayotgani holati
+      trackingData: null,
+      combinedTracking: [],
+      errorMessage: null,  // Ma'lumot topilmasa, xato xabar
+    };
+  },
+  methods: {
+    fetchTrackingData() {
+      this.loading = true; // Ma'lumotlar yuklanayotgani ko'rsatish
+      this.trackingData = null;
+      this.combinedTracking = [];
+      this.errorMessage = null;  // Xatolikni har safar so'rov boshlaganda tozalash
+
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', `https://new.pochta.uz/api/v1/public/test/${this.trackingNumber}/`, true);
+      xhr.onload = () => {
+        this.loading = false; // Ma'lumotlar kelsa, yuklanish holatini o'zgartirish
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const data = JSON.parse(xhr.responseText);
+
+          if (Array.isArray(data) && data.length > 0 && data[0].OperationalMailitems) {
+            const mailItem = data[0].OperationalMailitems.TMailitemInfoFromScanning[0];
+            this.trackingData = {
+              number: mailItem.InternationalId,
+              senderCountry: mailItem.OrigCountry.Name || '',
+              senderAddress: mailItem.OrigAddress || '',
+              senderPostcode: mailItem.OrigPostcode || '',
+              recipientCountry: mailItem.DestCountry.Name || '',
+              recipientAddress: mailItem.DestAddress || '',
+              recipientPostcode: mailItem.DestPostcode || ''
+            };
+
+            this.processEvents(mailItem.Events.TMailitemEventScanning, mailItem.DestCountry.Code);
+          } else {
+            this.processAlternativeData(data);
+          }
+        } else {
+          this.loading = false;
+          this.errorMessage = 'Ma\'lumot topilmadi'; // Xato holatida xabar
+        }
+      };
+      xhr.onerror = () => {
+        this.loading = false;
+        this.errorMessage = 'So\'rovni yuborishda xatolik yuz berdi'; // Xatolikni ko'rsatish
+      };
+      xhr.send();
+    },
+    processEvents(events, countryCode) {
+      this.combinedTracking = events.map(event => ({
+        date: new Date(event.LocalDateTime),
+        location: event.EventOffice.Name,
+        status: event.IPSEventType.Name,
+        country_code: countryCode
+      })).sort((a, b) => b.date - a.date);
+    },
+    processAlternativeData(data) {
+      // Fallback qiymatlar bilan trackingData-ni to'ldirish
+      this.trackingData = {
+        number: data.header?.data?.order_number || data.gdeposilka?.data?.tracking_number || 'Ma\'lumot yo\'q',
+        senderCountry: data.header?.data?.locations?.[0]?.address_city || '',
+        senderAddress: data.header?.data?.locations?.[0]?.address || '',
+        senderPostcode: data.header?.data?.locations?.[0]?.postcode || '',
+        recipientCountry: data.header?.data?.locations?.[1]?.address_city || '',
+        recipientAddress: data.header?.data?.locations?.[1]?.address || '',
+        recipientPostcode: data.header?.data?.locations?.[1]?.postcode || ''
+      };
+
+      let combinedList = [];
+      if (data.shipox && data.shipox.data && data.shipox.data.list) {
+        combinedList = data.shipox.data.list.map(item => ({
+          date: new Date(item.date),
+          data: item.data || 'UzPost', // null qiymatlar uchun 'UzPost' ko'rsatish
+          location: item.warehouse ? item.warehouse.name : '',
+          status: this.getStatusText(item.status_desc),
+          // country_code: data.header?.data?.locations?.[1]?.country?.code || ''
+          country_code: 'UZ' // har doim 'UZ' bo'lishini ta'minlash
+        }));
+      }
+
+      if (data.gdeposilka && data.gdeposilka.data && data.gdeposilka.data.checkpoints) {
+        combinedList = [
+          ...combinedList,
+          ...data.gdeposilka.data.checkpoints.map(item => ({
+            date: new Date(item.time),
+            location: item.location_translated,
+            region: item.courier.name,
+            status: this.getStatusText(item.status_name),
+            country_code: item.courier.country_code
+          }))
+        ];
+      }
+
+      // Barcha ma'lumotlarni birlashtirib chiqarish
+      this.combinedTracking = combinedList.sort((a, b) => b.date - a.date);
+    },
+    getStatusText(statusDesc) {
+      return statusDesc || 'Status noaniq';
+    }
+  }
+};
+</script>
+
+
+
+
+
+
+
+<style>
+.hidden {
+  display: none;
+}
+
+.loading-text {
+  font-size: 40px;
+  color: #f39c12;
+  margin-top: 10px;
+}
+
+.error-text {
+  font-size: 40px;
+  color: red;
+  margin-top: 10px;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  /* Rasmni containerga moslashtirish, ya'ni o'zgarmas holda to'liq qamrab olish */
+}
+
+.footer__section {
+  position: relative;
+  margin-top: 20px;
+  /* Footerning yuqori qismidan bo'shliq */
+  background-color: #333;
+  /* Agar kerak bo'lsa, fon rangini o'zgartiring */
+  padding: 20px 0;
+  /* Footer uchun ichki bo'shliq */
+}
+
+.region-info {
+  font-size: 10px;
+  color: #888;
+  display: block;
+  /* Yangi qatorga chiqishini ta'minlash */
+}
+</style>
