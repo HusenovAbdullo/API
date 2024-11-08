@@ -18,7 +18,7 @@
         </div>
         <div class="carousel-item">
           <a href="https://uz.post" target="_blank">
-            <img src="assets/img/reklama/rek2.png" class="d-block w-100" alt="banner2">
+            <img src="assets/img/reklama/15.png" class="d-block w-100" alt="banner2">
           </a>
         </div>
       </div>
@@ -203,6 +203,7 @@
       </div>
     </div>
   </footer>
+  
   <!--Footer Section-->
 
   <!-- <div>
@@ -240,23 +241,23 @@ export default {
   data() {
     return {
       trackingNumber: '',
-      loading: false,  // Ma'lumot yuklanayotgani holati
+      loading: false,
       trackingData: null,
       combinedTracking: [],
-      errorMessage: null,  // Ma'lumot topilmasa, xato xabar
+      errorMessage: null,
     };
   },
   methods: {
     fetchTrackingData() {
-      this.loading = true; // Ma'lumotlar yuklanayotgani ko'rsatish
+      this.loading = true;
       this.trackingData = null;
       this.combinedTracking = [];
-      this.errorMessage = null;  // Xatolikni har safar so'rov boshlaganda tozalash
+      this.errorMessage = null;
 
       const xhr = new XMLHttpRequest();
       xhr.open('GET', `https://new.pochta.uz/api/v1/public/test/${this.trackingNumber}/`, true);
       xhr.onload = () => {
-        this.loading = false; // Ma'lumotlar kelsa, yuklanish holatini o'zgartirish
+        this.loading = false;
         if (xhr.status >= 200 && xhr.status < 300) {
           const data = JSON.parse(xhr.responseText);
 
@@ -277,13 +278,12 @@ export default {
             this.processAlternativeData(data);
           }
         } else {
-          this.loading = false;
-          this.errorMessage = 'Ma\'lumot topilmadi'; // Xato holatida xabar
+          this.errorMessage = 'Ma\'lumot topilmadi';
         }
       };
       xhr.onerror = () => {
         this.loading = false;
-        this.errorMessage = 'So\'rovni yuborishda xatolik yuz berdi'; // Xatolikni ko'rsatish
+        this.errorMessage = 'So\'rovni yuborishda xatolik yuz berdi';
       };
       xhr.send();
     },
@@ -296,7 +296,6 @@ export default {
       })).sort((a, b) => b.date - a.date);
     },
     processAlternativeData(data) {
-      // Fallback qiymatlar bilan trackingData-ni to'ldirish
       this.trackingData = {
         number: data.header?.data?.order_number || data.gdeposilka?.data?.tracking_number || 'Ma\'lumot yo\'q',
         senderCountry: data.header?.data?.locations?.[0]?.address_city || '',
@@ -308,39 +307,40 @@ export default {
       };
 
       let combinedList = [];
+      let shipoxList = [];
+
       if (data.shipox && data.shipox.data && data.shipox.data.list) {
-        combinedList = data.shipox.data.list.map(item => ({
+        shipoxList = data.shipox.data.list.map(item => ({
           date: new Date(item.date),
-          data: item.data || 'UzPost', // null qiymatlar uchun 'UzPost' ko'rsatish
+          data: item.data || 'UzPost',
           location: item.warehouse ? item.warehouse.name : '',
           status: this.getStatusText(item.status_desc),
-          // country_code: data.header?.data?.locations?.[1]?.country?.code || ''
-          country_code: 'UZ' // har doim 'UZ' bo'lishini ta'minlash
+          country_code: 'UZ'
         }));
       }
 
       if (data.gdeposilka && data.gdeposilka.data && data.gdeposilka.data.checkpoints) {
-        combinedList = [
-          ...combinedList,
-          ...data.gdeposilka.data.checkpoints.map(item => ({
-            date: new Date(item.time),
-            location: item.location_translated,
-            region: item.courier.name,
-            status: this.getStatusText(item.status_name),
-            country_code: item.courier.country_code
-          }))
-        ];
+        combinedList = data.gdeposilka.data.checkpoints.map(item => ({
+          date: new Date(item.time),
+          location: item.location_translated,
+          region: item.courier.name,
+          status: this.getStatusText(item.status_name),
+          country_code: item.courier.country_code
+        }));
       }
 
-      // Barcha ma'lumotlarni birlashtirib chiqarish
-      this.combinedTracking = combinedList.sort((a, b) => b.date - a.date);
+      // Shipox ma'lumotlarini boshiga qo'shib, barcha ma'lumotlarni birlashtirib chiqarish
+      this.combinedTracking = [...shipoxList, ...combinedList.sort((a, b) => b.date - a.date)];
     },
     getStatusText(statusDesc) {
       return statusDesc || 'Status noaniq';
     }
   }
 };
+
 </script>
+
+
 
 
 
