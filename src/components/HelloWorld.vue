@@ -43,12 +43,13 @@
             <form action="#"
               class="search__component mb-24 d-flex align-items-center justify-content-between wow fadeInUp">
               <input v-model="trackingNumber" id="trackingNumberInput" placeholder="CC123456789UZ"
-                class="faded-placeholder">
+                class="faded-placeholder" @keyup.enter="fetchTrackingData">
               <button type="button" class="cmn--btn d-flex align-items-center" @click="fetchTrackingData">
                 <span>Kuzatish</span>
                 <span><i class="bi bi-search fz-12"></i></span>
               </button>
             </form>
+
             <div v-if="loading" class="loading-text">
               <span>Ma'lumotlar yuklanmoqda...</span>
             </div>
@@ -306,8 +307,8 @@ export default {
         recipientPostcode: data.header?.data?.locations?.[1]?.postcode || ''
       };
 
-      let combinedList = [];
       let shipoxList = [];
+      let gdeposilkaList = [];
 
       if (data.shipox && data.shipox.data && data.shipox.data.list) {
         shipoxList = data.shipox.data.list.map(item => ({
@@ -320,7 +321,7 @@ export default {
       }
 
       if (data.gdeposilka && data.gdeposilka.data && data.gdeposilka.data.checkpoints) {
-        combinedList = data.gdeposilka.data.checkpoints.map(item => ({
+        gdeposilkaList = data.gdeposilka.data.checkpoints.map(item => ({
           date: new Date(item.time),
           location: item.location_translated,
           region: item.courier.name,
@@ -329,16 +330,25 @@ export default {
         }));
       }
 
-      // Shipox ma'lumotlarini boshiga qo'shib, barcha ma'lumotlarni birlashtirib chiqarish
-      this.combinedTracking = [...shipoxList, ...combinedList.sort((a, b) => b.date - a.date)];
+      // Shipox ma'lumotlarini birinchi o'rinda, Gdeposilka ma'lumotlarini esa undan keyin qo'shib, vaqt bo'yicha saralash
+      // Shipox va Gdeposilka ro'yxatlarini alohida-alohida vaqt bo'yicha saralash
+      const sortedShipoxList = shipoxList.sort((a, b) => new Date(b.date) - new Date(a.date));
+      const sortedGdeposilkaList = gdeposilkaList.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+      // Shipox va Gdeposilka ro'yxatlarining birinchi elementlari asosida umumiy ro'yxatni tartibga solish
+      this.combinedTracking =
+        new Date(sortedShipoxList[0]?.date) > new Date(sortedGdeposilkaList[0]?.date)
+          ? [...sortedShipoxList, ...sortedGdeposilkaList]
+          : [...sortedGdeposilkaList, ...sortedShipoxList];
+
     },
     getStatusText(statusDesc) {
       return statusDesc || 'Status noaniq';
     }
   }
 };
-
 </script>
+
 
 
 
