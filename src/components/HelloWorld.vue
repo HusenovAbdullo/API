@@ -118,6 +118,15 @@
                   <h3 class="title2">Kuzatuv</h3>
                   <ul class="blog__categories" id="combinedTracking">
                     <!-- Shipox kuzatuv ma'lumotlari shu yerga kiritiladi -->
+                    <!-- <li v-for="(event, index) in combinedTracking" :key="index">
+                      <a href="#0" class="d-flex align-items-center" v-if="event.status1">
+                        <span class="fz-12 fw-500 title inter">{{ event.date1.toLocaleString() }}</span>
+                        <span class="cateicon">
+                          <img :src="`assets/img/flags/uz.svg`" alt="flag" class="flag-icon">
+                        </span>
+                        <span class="fz-12 d-block fw-500 inter success2">{{ event.status1 }}</span>
+                      </a>
+                    </li> -->
                     <li v-for="(event, index) in combinedTracking" :key="index">
                       <a href="#0" class="d-flex align-items-center">
                         <span class="fz-12 fw-500 title inter">{{ event.date.toLocaleString() }}</span>
@@ -128,10 +137,34 @@
                         <span class="fz-12 d-block fw-500 inter success2 region-info">{{ event.region }}</span>
                         <span class="fz-12 d-block fw-500 inter success2 region-info">{{ event.data }}</span>
                         <span class="fz-12 fw-500 inter title d-block">{{ event.location }}</span>
-                        <span class="fz-12 d-block fw-500 inter success2">{{ event.status }}</span>
-                      </a>
 
+                        <!-- status va malumotni tagma tag qilish uchun -->
+                        <!-- <span class="fz-12 fw-500 inter success2 d-block">{{ event.status }}</span>
+                        <span v-if="event.malumot" class="fz-12 fw-500 inter success2"
+                          style="color: brown; display: block;">
+                          {{ event.malumot }}
+                        </span> -->
+
+                        <span>
+                          <span class="fz-12 fw-500 inter success2 d-block">{{ event.status }}</span>
+                          <span v-if="event.malumot" class="fz-12 fw-500 inter success2"
+                            style="color: brown; display: block; font-size: 10px; opacity: 0.6;">
+                            {{ event.malumot }}
+                          </span>
+                          <span v-if="event.malumot2" class="fz-12 fw-500 inter success2"
+                            style="color: brown; display: block; font-size: 10px; opacity: 0.6;">
+                            {{ event.malumot2 }}
+                          </span>
+
+                        </span>
+
+
+                      </a>
                     </li>
+
+
+
+
                   </ul>
                 </div>
               </div>
@@ -204,7 +237,7 @@
       </div>
     </div>
   </footer>
-  
+
   <!--Footer Section-->
 
   <!-- <div>
@@ -291,8 +324,11 @@ export default {
     processEvents(events, countryCode) {
       this.combinedTracking = events.map(event => ({
         date: new Date(event.LocalDateTime),
+        date1: new Date(event.GmtDateTime),
         location: event.EventOffice.Name,
         status: event.IPSEventType.Name,
+        malumot: event.RetentionReason.Name,
+        malumot2: event.NonDeliveryReason.Name,
         country_code: countryCode
       })).sort((a, b) => b.date - a.date);
     },
